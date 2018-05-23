@@ -1,3 +1,4 @@
+'use strict';
 
 const express = require('express');
 const router = express.Router();
@@ -37,7 +38,7 @@ app.post('/shopping-list', jsonParser, (req, res) => {
   for (let i=0; i<requiredFields.length; i++) {
     const field = requiredFields[i];
     if (!(field in req.body)) {
-      const message = `Missing \`${field}\` in request body`
+      const message = `Missing \`${field}\` in request body`;
       console.error(message);
       return res.status(400).send(message);
     }
@@ -57,7 +58,7 @@ app.put('/shopping-list/:id', jsonParser, (req, res) => {
   for (let i=0; i<requiredFields.length; i++) {
     const field = requiredFields[i];
     if (!(field in req.body)) {
-      const message = `Missing \`${field}\` in request body`
+      const message = `Missing \`${field}\` in request body`;
       console.error(message);
       return res.status(400).send(message);
     }
@@ -76,6 +77,30 @@ app.put('/shopping-list/:id', jsonParser, (req, res) => {
   });
   res.status(204).end();
 });
+
+
+app.put('/recipes/:id', jsonParser, (req, res) =>{
+  const requiredFields = ['name', 'ingredients', 'id'];
+  requiredFields.forEach(field =>{
+    if(!(field in req.body)) {
+      return res.status(400).send(`missing ${field} in request body`);
+    }
+  });
+  
+  if(req.params.id !== req.body.id){
+    return res.status(400).send('path id and body id must match');
+  };
+
+  console.log(`Updating recipe item \`${req.params.id}\``);
+  
+  Recipes.update({
+    id: req.params.id,
+    name: req.body.name,
+    ingredients: req.body.ingredients
+  });
+  res.status(204).end();
+});
+
 
 // when DELETE request comes in with an id in path,
 // try to delete that item from ShoppingList.
@@ -96,7 +121,7 @@ app.post('/recipes', jsonParser, (req, res) => {
   for (let i=0; i<requiredFields.length; i++) {
     const field = requiredFields[i];
     if (!(field in req.body)) {
-      const message = `Missing \`${field}\` in request body`
+      const message = `Missing \`${field}\` in request body`;
       console.error(message);
       return res.status(400).send(message);
     }
